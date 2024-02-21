@@ -214,6 +214,6 @@ void loop()
   msg_cnt++;
   // delay to be relooked at!
   // remove or set to 1?
-  delay (10);
+  delay (1);
 }
  

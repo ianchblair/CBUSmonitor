@@ -31,6 +31,7 @@
 #include <Adafruit_GFX.h> // Graphics and fonts library UPLOAD
 #include <Adafruit_ILI9341.h>  // TFT LCD hardware drivers  UPLOAD
 #include "cbusdefs.h"
+#include "CBUScolourMap.h"
 
 #define SCREEN_WIDTH 360 // OLED display width, in pixels
 #define SCREEN_HEIGHT 240 // OLED display height, in pixels
@@ -40,6 +41,8 @@
 #define TFT_RST 8 // D8
 Adafruit_ILI9341 tftdisplay = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_RST); 
 static uint32_t CanId = 1; // Temporary value
+
+uint16_t colourMap[COLOUR_MAP_SIZE];
 
 // This section run only once at startup
 void display_setup() {
@@ -52,6 +55,7 @@ void display_setup() {
   tftdisplay.setCursor(0, 10);
   tftdisplay.println(" ILI9341 CBUS(r) Monitor v0.1");
   tftdisplay.println(" ");
+  CBUScolourMap(colourMap); // Set up colour lookup table
 }
 
 // Display buffer
@@ -91,43 +95,44 @@ void display_all()
 }
 
 // Allocates colour according to opcode category and value
-uint16_t text_colour(uint8_t opcode)
-{
-  uint16_t colour;
+//uint16_t text_colour(uint8_t opcode)
+//{
+//  uint16_t colour;
 // Categories are config, layout control, locomotive control and bus control
 // layout On and off we allocate specific colours to (green for on, red for off)
-  switch (opcode)
-  {
-  // Some Config messages
-  case OPC_RQNN:
-  case OPC_RQNP:
-  case OPC_PARAMS:
-  case OPC_NAME:
-  case OPC_SNN:
-  case OPC_NNACK:
-    colour = ILI9341_MAGENTA;
-    break;
+//  switch (opcode)
+//  {
+//  // Some Config messages
+//  case OPC_RQNN:
+//  case OPC_RQNP:
+//  case OPC_PARAMS:
+//  case OPC_NAME:
+//  case OPC_SNN:
+//  case OPC_NNACK:
+    // colour = ILI9341_MAGENTA;
+//    colour = 0xE01C;
+//    break;
   // Layout control ON
-  case OPC_ACON:
-  case OPC_ASON:
-    colour = ILI9341_GREEN;
-    break;
+//  case OPC_ACON:
+//  case OPC_ASON:
+//    colour = ILI9341_GREEN;
+//    break;
   // layout  control OFF
-  case OPC_ACOF:
-  case OPC_ASOF:
-    colour = ILI9341_RED;
-    break;
+//  case OPC_ACOF:
+//  case OPC_ASOF:
+//    colour = ILI9341_RED;
+//    break;
   // Traction messages
-  case OPC_RDCC3:
-  case OPC_RDCC4:
-  case OPC_RDCC5:
-    colour - ILI9341_BLUE;
-  default:
-    colour = ILI9341_BLACK;
-    break;
-  }
-  return(colour);
-}
+//  case OPC_RDCC3:
+//  case OPC_RDCC4:
+//  case OPC_RDCC5:
+//    colour - ILI9341_BLUE;
+//  default:
+//    colour = ILI9341_BLACK;
+//    break;
+//  }
+//  return(colour);
+//}
 
 void can_setup() {
   if (!CAN.begin(CanBitRate::BR_125k))
@@ -198,7 +203,8 @@ void loop()
     //*disp_ptr = '\0';
     Serial.println(disp_data);
     uint8_t opc = msg.data[0];
-    uint16_t disp_colour = text_colour(opc);
+    //uint16_t disp_colour = text_colour(opc);
+    uint16_t disp_colour = colourMap[opc];
     display_add(disp_colour, disp_data);
     update_display = true;
   }
@@ -214,6 +220,6 @@ void loop()
   msg_cnt++;
   // delay to be relooked at!
   // remove or set to 1?
-  delay (10);
+  delay (1);
 }
  

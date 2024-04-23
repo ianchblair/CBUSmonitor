@@ -5,7 +5,7 @@
 // 
 // Designed for Arduino Uno R4
 //
-// This sketch disokays CBUS activity on an SPI TFT display
+// This sketch displays CBUS activity on an SPI TFT display
 // Connect Arduino 3.3v to OLED Vcc and CAN Tx/Rx
 // Connect Arduino Gnd to OLED Gnd and CAN tx/Rx
 //
@@ -91,6 +91,7 @@ void display_all()
     tftdisplay.println(p->text_data);
     p++;
     if ((p - &displayBuffer[0]) >= TFTDISPLAY_LENGTH) p = &displayBuffer[0];
+    if (CAN.available()) break; // Abort (and implicitly restart) if new data to display before we have finished
   }   
 }
 
